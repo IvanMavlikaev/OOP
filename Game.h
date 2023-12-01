@@ -15,6 +15,7 @@
 
 
 
+
 class Game : public Observable {
     private:
         Field *field;
