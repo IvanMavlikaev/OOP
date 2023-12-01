@@ -1,11 +1,12 @@
 #include "Game.h"
 #include "fstream"
-#include "Read.h"
-#include "Read_console.h"
-#include "Read_file.h"
+
 
 #define size_x 8
 #define size_y 8
+
+
+Game::Game(){}
 
 void Game::start_game() {
     std::string name;
@@ -26,9 +27,11 @@ void Game::start_game() {
             std::cout << "Uncorrect number of level\n";
             return;
         }
-    this->field->print_field();
     this->controller = new Controller(*new Player(name), *field);
     this->controller->print_player();
+    Stalker *stalker = new Stalker();
+    this->add_observer(stalker);
+    
     this->game();
 }
 
@@ -36,17 +39,20 @@ void Game::game() {
     std::cout << "Выберите, как вы будете вводить данные - напишите 1 если в консоли, напишите 2 если в файле. Если в файле то введите имя файла\n";
     int input;
     std::cin >> input;
+    Print_game* print = new Print_game();
     if (input == 1) {
         motion m;
-        Read *read = new Read_console();
+        Read *read = new Read_console();  
+        print->print_game(this->controller, this->field);
         while (!this->controller->player_dead()) {
             if (this->controller->get_pos() == this->field->get_end_pos()) {
                 break;
             }
             m = read->read_motion();
             this->controller->step(m);
-            this->controller->print_player();
-            this->field->print_field();
+            if (m != Stay) {
+                this->update(Position);
+            }
         }
     }
     else if (input == 2) {
@@ -54,6 +60,7 @@ void Game::game() {
         std::string filename;
         std::cin >> filename;
         Read *read = new Read_file(filename);
+        print->print_game(this->controller, this->field);
         while (!this->controller->player_dead() ) {
             if (this->controller->get_pos() == this->field->get_end_pos()) {
                 break;
@@ -65,8 +72,9 @@ void Game::game() {
                 return;
             }
             this->controller->step(m);
-            this->controller->print_player();
-            this->field->print_field();
+            if (m != Stay) {
+                this->update(Position);
+            }
         }
     }
     else {
@@ -77,15 +85,28 @@ void Game::game() {
 }
 
 void Game::end_game() {
-    if (this->controller->player_dead()) 
-        std::cout << "YOU LOST\n";
-    else {
-        std::cout << "YOU WIN\n";
-    }
-    std::cout << "Если вы хотите начать новую игру, введите Y\n";
+    this->update(End);
     char c;
     std::cin>> c;
     if (c == 'Y') {
         this->start_game();
+    }
+}
+
+void Game :: add_observer(Observer *observer) {
+    this->observers.push_back(observer);
+}
+
+void Game :: remove_observer(Observer *observer) {
+    for (int i = 0; i < this->observers.size(); i++) {
+        if (observers[i] == observer) {
+            observers.erase(observers.begin() + i);
+        }
+    }
+}
+
+void Game :: update(change c) {
+    for (int i = 0; i < observers.size(); i++) {
+        observers[i]->handle_event(controller, field, c);
     }
 }
