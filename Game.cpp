@@ -31,8 +31,7 @@ void Game::start_game() {
     this->controller->print_player();
     Stalker *stalker = new Stalker();
     this->add_observer(stalker);
-    
-    this->game();
+    game();
 }
 
 void Game::game() {
@@ -42,7 +41,7 @@ void Game::game() {
     Print_game* print = new Print_game();
     if (input == 1) {
         motion m;
-        Read *read = new Read_console();  
+        Read *read = new Read_console();
         print->print_game(this->controller, this->field);
         while (!this->controller->player_dead()) {
             if (this->controller->get_pos() == this->field->get_end_pos()) {
@@ -81,16 +80,12 @@ void Game::game() {
         std::cout << "Error with choice thret\n";
         return;
     }
-    this->end_game();
+    end_game();
+    return;
 }
 
 void Game::end_game() {
     this->update(End);
-    char c;
-    std::cin>> c;
-    if (c == 'Y') {
-        this->start_game();
-    }
 }
 
 void Game :: add_observer(Observer *observer) {

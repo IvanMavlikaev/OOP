@@ -14,6 +14,9 @@ void Controller::step(motion m){
             for (int i = 0; i < count_step; i++) {
                 if (this->pos.second > 0 && this->field.get_cell_list()[this->pos.first][this->pos.second - 1].get_cell_mode() == Free)  {
                     this->pos.second -= 1;
+                    std::cout << "up\n";
+                    if (!(this->pos.first && this->pos.second))
+                    std::cout << 0 << '\n';
                     this->check_event();
                 }
                 else {
@@ -95,7 +98,8 @@ void Controller::print_player(){
     std::cout << "Position: " << "X: " <<pos.first << " Y: " << pos.second << '\n';
 }
 
-void Controller::check_event() { 
+void Controller::check_event() {
+
     if (this->field.get_cell_list()[this->pos.first][this->pos.second].get_event()) {
         this->field.get_cell_list()[this->pos.first][this->pos.second].get_event()->do_event(*this);
     }

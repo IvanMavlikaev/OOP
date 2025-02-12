@@ -28,9 +28,9 @@ class Game : public Observable {
         void start_game();
         
         void game();
-
+        
         void end_game();
-
+	
         void add_observer(Observer *observer);
 
         void remove_observer(Observer *observer);
